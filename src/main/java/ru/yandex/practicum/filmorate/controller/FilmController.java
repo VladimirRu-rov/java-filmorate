@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -25,7 +26,7 @@ public class FilmController {
 	}
 
 	@PostMapping
-	public Film addFilm(@RequestBody Film film) {
+	public Film addFilm(@Valid @RequestBody Film film) {
 		try {
 			validateFilm(film);
 			long newId = getNextId();
@@ -40,7 +41,7 @@ public class FilmController {
 	}
 
 	@PutMapping
-	public Film updateFilm(@RequestBody Film newFilm) {
+	public Film updateFilm(@Valid @RequestBody Film newFilm) {
 		if (newFilm.getId() == null) {
 			throw new ValidationException("ID фильма не может быть null.");
 		}
@@ -65,21 +66,9 @@ public class FilmController {
 		}
 	}
 
-	public void validateFilm(Film film) {
-		if (film.getName() == null || film.getName().trim().isEmpty()) {
-			throw new ValidationException("Название не может быть пустым.");
-		}
-		if (film.getDescription().length() > 200) {
-			throw new ValidationException("Описание не может быть длиннее 200 символов.");
-		}
-		if (film.getReleaseDate() == null) {
-			throw new ValidationException("Дата релиза обязательна.");
-		}
+	private void validateFilm(Film film) {
 		if (film.getReleaseDate().isBefore(Film.getMinDate())) {
 			throw new ValidationException("Дата релиза слишком ранняя. Минимум: " + Film.getMinDate());
-		}
-		if (film.getDuration() <= 0) {
-			throw new ValidationException("Продолжительность фильма не может быть отрицательной или нулевой.");
 		}
 	}
 

@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,11 +25,13 @@ public class UserController {
 	}
 
 	@PostMapping
-	public User addUser(@RequestBody User user) {
+	public User addUser(@Valid @RequestBody User user) {
 		try {
-			validateUser(user);
 			long newId = getNextId();
 			user.setId(newId);
+			if (user.getName() == null || user.getName().trim().isEmpty()) {
+				user.setName(user.getLogin());
+			}
 			users.put(newId, user);
 			log.info("Пользователь создан ID: {}, логин: {},", newId, user.getLogin());
 			return user;
@@ -40,7 +42,7 @@ public class UserController {
 	}
 
 	@PutMapping
-	public User updateUser(@RequestBody User newUser) {
+	public User updateUser(@Valid @RequestBody User newUser) {
 		if (newUser.getId() == null) {
 			log.warn("Попытка обновления пользователя без указания Id.");
 			throw new ValidationException("Id должен быть указан.");
@@ -49,12 +51,12 @@ public class UserController {
 			log.warn("Пользователь с ID: {} не найден", newUser.getId());
 			throw new NotFoundException("Пользователь с ID " + newUser.getId() + " не найден.");
 		}
-
-
 		User oldUser = users.get(newUser.getId());
 		try {
-			validateUser(newUser);
 			oldUser.setName(newUser.getName());
+			if (newUser.getName() == null || newUser.getName().trim().isEmpty()) {
+				newUser.setName(newUser.getLogin());
+			}
 			oldUser.setLogin(newUser.getLogin());
 			oldUser.setEmail(newUser.getEmail());
 			oldUser.setBirthday(newUser.getBirthday());
@@ -64,26 +66,6 @@ public class UserController {
 		} catch (ValidationException e) {
 			log.warn("Ошибка при обновлении пользователя c ID: {}: {}", newUser.getId(), e.getMessage());
 			throw e;
-		}
-	}
-
-	public void validateUser(User user) {
-		if (user.getEmail() == null || user.getEmail().trim().isEmpty() || !user.getEmail().contains("@")) {
-			throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @");
-		}
-		if (user.getLogin() == null || user.getLogin().trim().isEmpty() || user.getLogin().contains(" ")) {
-			throw new ValidationException("Логин не может быть пустым и содержать пробелы");
-		}
-		if (user.getBirthday() == null) {
-			throw new ValidationException("Дата рождения обязательна");
-		}
-		if (user.getBirthday().isAfter(LocalDate.now())) {
-			throw new ValidationException("Дата рождения не может быть в будущем.");
-		}
-
-		// Подстановка login если имя пустое
-		if (user.getName() == null || user.getName().trim().isEmpty()) {
-			user.setName(user.getLogin());
 		}
 	}
 
