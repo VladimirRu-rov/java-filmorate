@@ -18,6 +18,22 @@ import java.util.Set;
 public class UserService {
 	private final UserStorage userStorage;
 
+	public Collection<User> showAllUsers() {
+		return userStorage.showAllUsers();
+	}
+
+	public User addUser(User user) {
+		return userStorage.addUser(user);
+	}
+
+	public User updateUser(User newUser) {
+		return userStorage.updateUser(newUser);
+	}
+
+	public User getUserById(Long userId) {
+		return userStorage.getUserById(userId);
+	}
+
 	public void addFriends(Long userId, Long friendId) {
 		User user = userStorage.getUserById(userId);
 		User friend = userStorage.getUserById(friendId);

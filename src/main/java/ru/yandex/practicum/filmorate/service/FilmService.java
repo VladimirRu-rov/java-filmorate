@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,7 +17,19 @@ import java.util.List;
 public class FilmService {
 
 	private final FilmStorage filmStorage;
-	private final UserStorage userStorage;
+	private final UserService userService;
+
+	public Collection<Film> showAllFilm() {
+		return filmStorage.showAllFilm();
+	}
+
+	public Film addFilm(Film film) {
+		return filmStorage.addFilm(film);
+	}
+
+	public Film updateFilm(Film newFilm) {
+		return filmStorage.updateFilm(newFilm);
+	}
 
 	public Film likeFilm(Long filmId, Long userId) {
 		log.debug("Попытка поставить лайк фильму. FilmID: {}, UserID: {}", filmId, userId);
@@ -28,7 +39,7 @@ public class FilmService {
 			log.warn("Фильм с ID {} не найден при попытке поставить лайк", filmId);
 			throw new NotFoundException("Фильм не найден");
 		}
-		if (userStorage.getUserById(userId) == null) {
+		if (userService.getUserById(userId) == null) {
 			log.warn("Пользователь с ID {} не найден при попытке поставить лайк", userId);
 			throw new NotFoundException("Пользователь не найден");
 		}
@@ -54,7 +65,7 @@ public class FilmService {
 			log.warn("Фильм с ID {} не найден при попытке снять лайк", filmId);
 			throw new NotFoundException("Фильм не найден");
 		}
-		if (userStorage.getUserById(userId) == null) {
+		if (userService.getUserById(userId) == null) {
 			log.warn("Пользователь с ID {} не найден при попытке снять лайк", userId);
 			throw new NotFoundException("Пользователь не найден");
 		}
