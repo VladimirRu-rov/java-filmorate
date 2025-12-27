@@ -29,26 +29,35 @@ public class FilmController {
 	}
 
 	@PutMapping
-	public Film updateFilm(@Valid @RequestBody Film newFilm) {
-		return filmService.updateFilm(newFilm);
+	public Film updateFilm(@Valid @RequestBody Film film) {
+		return filmService.updateFilm(film);
+	}
+
+	@DeleteMapping("/{filmId}")
+	public Film deleteFilm(@PathVariable Integer filmId) {
+		return filmService.deleteFilm(filmId);
 	}
 
 	@PutMapping("/{filmId}/like/{userId}")
-	public Film likeFilm(@PathVariable Long filmId, @PathVariable Long userId) {
+	public Film likeFilm(@PathVariable Integer filmId, @PathVariable Integer userId) {
 		return filmService.likeFilm(filmId, userId);
 	}
 
 	@DeleteMapping("/{filmId}/like/{userId}")
-	public Film unlikeFilm(@PathVariable Long filmId, @PathVariable Long userId) {
+	public Film unlikeFilm(@PathVariable Integer filmId, @PathVariable Integer userId) {
 		return filmService.unlikeFilm(filmId, userId);
 	}
 
 	@GetMapping("/popular")
 	public List<Film> getMostLikedFilms(@RequestParam(defaultValue = "10") int count) {
-		if (count < 0) {
-			throw new IllegalArgumentException("Количество фильмов не может быть отрицательным");
-		}
 		return filmService.getMostLikedFilms(count);
 	}
+
+	@GetMapping("/{filmId}")
+	public Film getFilmById(@PathVariable Integer filmId) {
+		return filmService.getFilmById(filmId);
+	}
 }
+
+
 
